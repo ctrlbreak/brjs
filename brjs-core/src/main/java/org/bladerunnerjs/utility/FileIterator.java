@@ -69,20 +69,20 @@ public class FileIterator {
 		// directories, allowing the parent directory observers to be informed at very little cost when a change occurs within a child directory.
 		long mostRecentLastModified = lastModified;
 		
-		for(File childDir : dirs()) {
-			FileIterator childFileIterator = brjs.getFileIterator(childDir);
-			long childLastModified = childFileIterator.getLastModified();
-			
-			if(childLastModified > mostRecentLastModified) {
-				mostRecentLastModified = childLastModified;
-			}
-		}
+//		for(File childDir : dirs()) {
+//			FileIterator childFileIterator = brjs.getFileIterator(childDir);
+//			long childLastModified = childFileIterator.getLastModified();
+//			
+//			if(childLastModified > mostRecentLastModified) {
+//				mostRecentLastModified = childLastModified;
+//			}
+//		}
 		
 		return mostRecentLastModified;
 	}
 	
 	private void updateIfChangeDetected() {
-		if((directoryObserver.hasChangedSinceLastCheck()) || (files == null)) {
+		if((directoryObserver.hasRecursivelyChangedSinceLastCheck()) || (files == null)) {
 			lastModified = new Date().getTime();
 			files = Arrays.asList(dir.listFiles());
 			Collections.sort(files, NameFileComparator.NAME_COMPARATOR);
