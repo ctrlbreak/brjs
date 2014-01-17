@@ -155,8 +155,11 @@ br.presenter.node.PresentationNode.prototype._convertToMap = function(vPropertie
  * @private
  * @param {String} sPath
  */
-br.presenter.node.PresentationNode.prototype._$setPath = function(sPath, oPresenterComponent)
-{
+br.presenter.node.PresentationNode.prototype._$setPath = function(sPath, oPresenterComponent) {
+	
+	if (sPath === 'undefined' || sPath === undefined) {
+		throw new Error('undefined');
+	}
 	this.m_sPath = sPath;
 	
 	for(var sChildToBeSet in this)
@@ -168,12 +171,9 @@ br.presenter.node.PresentationNode.prototype._$setPath = function(sPath, oPresen
 			var sCurrentPath = oChildToBeSet.getPath();
 			var sChildPath = sPath + '.' + sChildToBeSet;
 			
-			if(sCurrentPath === undefined)
-			{
+			if(sCurrentPath === undefined) {
 				oChildToBeSet._$setPath(sChildPath, oPresenterComponent);
-			}
-			else if(sCurrentPath !== sChildPath)
-			{
+			} else if(sCurrentPath !== sChildPath) {
 				this._checkAncestor(sCurrentPath, sChildPath);
 			}
 		}
@@ -189,15 +189,15 @@ br.presenter.node.PresentationNode.prototype._$setPath = function(sPath, oPresen
  */
 br.presenter.node.PresentationNode.prototype._checkAncestor = function(sOtherPath, sChildPath)
 {
-	if(sOtherPath === ""){ // the toplevel - PresentationModel
+	if(sOtherPath === "") { // the toplevel - PresentationModel
 		return;
 	}
 	
-	if(sChildPath.indexOf(sOtherPath) != 0){
+	if (sChildPath.indexOf(sOtherPath) != 0) {
 		var msg = "OtherPath: '" + sOtherPath + "  'ChildPath:'" + sChildPath + "' are both references to the same instance in PresentationNode.";
 		throw new br.Errors.IllegalStateError(msg);
 	}
-}
+};
 
 br.presenter.node.PresentationNode.prototype._isPresenterChild = function(sChildToBeSet, oChildToBeSet)
 {
@@ -206,22 +206,9 @@ br.presenter.node.PresentationNode.prototype._isPresenterChild = function(sChild
 
 /**
  * @private
- * Sets the path on all properties to undefined.
- */
-br.presenter.node.PresentationNode.prototype._$clearPropertiesPath = function()
-{
-	var pProperties = this.properties();
-	for(var i = 0; i < pProperties.m_pProperties.length; i++){
-		pProperties.m_pProperties[i]._$setPath(undefined);
-	}
-};
-
-/**
- * @private
  * Sets the path on all properties and on this <code>PresentationNode</code> to undefined.
  */
-br.presenter.node.PresentationNode.prototype._$clearNodePaths = function()
-{
+br.presenter.node.PresentationNode.prototype._$clearPaths = function() {
 	// It's possible for nodes to be newly created and then passed into
 	// a NodeList before the nodes have had their path set.  This causes
 	// problems here.
@@ -229,11 +216,17 @@ br.presenter.node.PresentationNode.prototype._$clearNodePaths = function()
 	// path set.  This is probably wrong and will need to be fixed properly.
 	if (this.m_sPath === undefined) return;
 
-	var pNodes = this.nodes().getNodesArray();
-	this._$clearPropertiesPath();
-	for(var i = 0; i < pNodes.length; i++)
-	{
-		pNodes[i]._$clearNodePaths();
+	for (var sKey in this) {
+		var child = this[sKey];
+		if (child) {
+			if (child["_$clearPaths"]) {
+				// for presentation nodes
+				child._$clearPaths(); 
+			} else if (child["_$setPath"]) {
+				// for properties
+				child._$setPath(undefined);
+			}
+		}
 	}
 	this.m_sPath = undefined;
 };

@@ -41,7 +41,7 @@ br.presenter.node.NodeList = function(pPresentationNodes, fNodeClass)
 	/** @private */
 	this.m_oChangeListenerFactory = new br.util.ListenerFactory(br.presenter.node.NodeListListener, "onNodeListChanged");
 	
-	this._copiesAndChecksNodesAndClearsNodePaths(pPresentationNodes);
+	this._copiesAndChecksNodesAndClearsPaths(pPresentationNodes);
 };
 br.extend(br.presenter.node.NodeList, br.presenter.node.PresentationNode);
 br.inherit(br.presenter.node.NodeList, br.presenter.view.knockout.KnockoutNodeList);
@@ -77,7 +77,7 @@ br.presenter.node.NodeList.prototype.getTemplateForNode = function(oPresentation
  */
 br.presenter.node.NodeList.prototype.updateList = function(pPresentationNodes)
 {
-	this._copiesAndChecksNodesAndClearsNodePaths(pPresentationNodes);
+	this._copiesAndChecksNodesAndClearsPaths(pPresentationNodes);
 	this._setPathsOfNewlyAddedNodes();
 
 	for(var i = 0; i < this.m_pUpdateListeners.length; i++){
@@ -184,11 +184,11 @@ br.presenter.node.NodeList.prototype._$setPath = function(sPath, oPresenterCompo
  * @private
  * Recursively sets the the node path and property paths to undefined so that paths are recalculated when node are moved.
  */
-br.presenter.node.NodeList.prototype._$clearNodePaths = function()
+br.presenter.node.NodeList.prototype._$clearPaths = function()
 {
 	for(var i = 0; i < this.m_pItems.length; i++)
 	{
-		this.m_pItems[i]._$clearNodePaths();
+		this.m_pItems[i]._$clearPaths();
 	}
 	this.m_sPath = undefined;
 };
@@ -219,19 +219,22 @@ br.presenter.node.NodeList.prototype._getNodes = function(sNodeName, pPropertyLi
  * @private
  * @param {Array} pNodes
  */
-br.presenter.node.NodeList.prototype._copyAndCheckNodes = function(pNodes)
-{
-	var pResult = [];
-	if (!pNodes || !pNodes.length) return pResult;
+br.presenter.node.NodeList.prototype._copyAndCheckNodes = function(pNodes) {
+	if (!pNodes || !pNodes.length) return [];
+
+	var pResult = pNodes.slice();
 	
-	for(var i = 0; i < pNodes.length; i++){
-		var oNode = pNodes[i];
-		if(this.m_fPermittedClass && !(oNode instanceof this.m_fPermittedClass)) {
-			var msg =  "Each nodelist item needs to implement br.presenter.node.PresentationNode or a valid fNodeClass";
-			throw new br.Errors.CustomError(Error.UNIMPLEMENTED_INTERFACE, msg);
+	if (this.m_fPermittedClass) {
+		for (var i = 0; i < pResult.length; i++) {
+			var oNode = pNodes[i];
+
+			if (oNode instanceof this.m_fPermittedClass === false) {
+				var msg =  "Each nodelist item needs to implement br.presenter.node.PresentationNode or a valid fNodeClass";
+				throw new br.Errors.UnimplementedInterfaceError(msg);
+			}
 		}
-		pResult.push(oNode);
 	}
+	
 	return pResult;
 };
 
@@ -240,13 +243,11 @@ br.presenter.node.NodeList.prototype._copyAndCheckNodes = function(pNodes)
  * Recursively sets the the node path and property paths to undefined so that paths are recalculated when node are moved.
  * @param {Array} pPresentationNodes A list of {@link br.presenter.node.PresentationNode} instances.
  */
-br.presenter.node.NodeList.prototype._copiesAndChecksNodesAndClearsNodePaths = function(pPresentationNodes)
-{
+br.presenter.node.NodeList.prototype._copiesAndChecksNodesAndClearsPaths = function(pPresentationNodes) {
 	this.m_pItems = this._copyAndCheckNodes(pPresentationNodes);
 	
-	for(var i = 0; i < this.m_pItems.length; i++)
-	{
-		this.m_pItems[i]._$clearNodePaths();
+	for(var i = 0; i < this.m_pItems.length; i++) {
+		this.m_pItems[i]._$clearPaths();
 	}
 };
 
@@ -256,8 +257,7 @@ br.presenter.node.NodeList.prototype._copiesAndChecksNodesAndClearsNodePaths = f
  */
 br.presenter.node.NodeList.prototype._setPathsOfNewlyAddedNodes = function()
 {
-	if(this.getPath() !== undefined)
-	{
+	if (this.getPath() !== undefined) {
 		for(var i = 0; i < this.m_pItems.length; i++)
 		{
 			this.m_pItems[i]._$setPath(this.getPath() + "." + i, this.__oPresenterComponent);

@@ -152,7 +152,7 @@ PresentationNodeTest.prototype.test_PropertyPathsAreCleared = function()
 	oPresentationModel._$setPath("");
 	assertEquals("1d", "child.grandchild.property4", oPresentationModel.child.grandchild.property4.getPath());
 	
-	oPresentationModel._$clearPropertiesPath();
+	oPresentationModel._$clearPaths();
 
 	assertEquals("1a", undefined, oPresentationModel.property1.getPath());
 	assertEquals("1b", undefined, oPresentationModel.child.property2.getPath());
@@ -226,7 +226,7 @@ PresentationNodeTest.prototype.test_NodePathsAreCleared = function()
 	assertEquals("1b", "child", oPresentationModel.child.getPath());
 	assertEquals("1d", "child.grandchild", oPresentationModel.child.grandchild.getPath());
 	
-	oPresentationModel._$clearNodePaths();
+	oPresentationModel._$clearPaths();
 
 	assertEquals("1a", undefined, oPresentationModel.property1.getPath());
 	assertEquals("1b", undefined, oPresentationModel.child.getPath());

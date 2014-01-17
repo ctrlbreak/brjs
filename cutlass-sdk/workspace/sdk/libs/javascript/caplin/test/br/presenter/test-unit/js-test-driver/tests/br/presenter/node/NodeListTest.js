@@ -201,7 +201,7 @@ NodeListTest.prototype.test_canInvokeAChangeOnlyListenerImmediately = function()
 	oNodeList.addChangeListener(oListenerMock.proxy(), "invocationMethod", true);
 };
 
-NodeListTest.prototype.test_clearNodeRecursivelyClearsNodePaths = function ()
+NodeListTest.prototype.test_clearNodeRecursivelyClearsPaths = function ()
 {
 	
 	var pPresentationNodes = [this.limitedRootNode.descendantNode1, this.limitedRootNode.descendantNode2, this.limitedRootNode.parentNode1];
@@ -209,7 +209,7 @@ NodeListTest.prototype.test_clearNodeRecursivelyClearsNodePaths = function ()
 	var pNodes = oNodeList.getPresentationNodesArray();
 	assertEquals(3,undefined, pNodes[0].getPath());
 	pNodes = oNodeList.getPresentationNodesArray();
-	oNodeList._copiesAndChecksNodesAndClearsNodePaths(pNodes);
+	oNodeList._copiesAndChecksNodesAndClearsPaths(pNodes);
 	assertEquals(3,undefined, pNodes[0].getPath());
 	assertEquals(3,undefined, pNodes[0].getPath());
 };
