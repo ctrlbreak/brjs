@@ -22,6 +22,7 @@ import org.bladerunnerjs.model.App;
 import org.bladerunnerjs.model.BRJS;
 import org.bladerunnerjs.model.BladerunnerUri;
 import org.bladerunnerjs.model.BundlableNode;
+import org.bladerunnerjs.model.BundleSet;
 import org.bladerunnerjs.model.RequestMode;
 import org.bladerunnerjs.model.exception.request.MalformedRequestException;
 import org.bladerunnerjs.utility.TagPluginUtility;
@@ -88,8 +89,8 @@ public class BRJSServletFilter implements Filter
 			{
 				StringWriter tagPluginStringWriter = new StringWriter();
 				BladerunnerUri bladerunnerUri = servletUtils.createBladeRunnerUri(brjs, servletContext, request);
-				App app = servletUtils.getAppForRequest(brjs, bladerunnerUri, response);
-				BundlableNode bundleableNode = servletUtils.getBundableNodeForRequest(brjs, bladerunnerUri, response);
+				App app = servletUtils.getAppForRequest(brjs, bladerunnerUri);
+				BundlableNode bundleableNode = servletUtils.getBundableNodeForRequest(brjs, bladerunnerUri);
 
 				if (bundleableNode != null)
 				{
@@ -99,7 +100,8 @@ public class BRJSServletFilter implements Filter
 					
 					String responseData = getResponseData(responseWrapper);
 					String locale = LocaleHelper.getLocaleFromRequest(app, request);
-					TagPluginUtility.filterContent(responseData, bundleableNode.getBundleSet(), tagPluginStringWriter, RequestMode.Dev, locale);
+					BundleSet bundleSet = bundleableNode.getBundleSet();
+					TagPluginUtility.filterContent(responseData, bundleSet, tagPluginStringWriter, RequestMode.Dev, locale);
 					
 					byte[] filteredData = tagPluginStringWriter.toString().getBytes();
 					response.setContentLength(filteredData.length);

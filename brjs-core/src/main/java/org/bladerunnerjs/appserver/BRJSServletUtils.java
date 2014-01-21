@@ -63,7 +63,7 @@ public class BRJSServletUtils
 	{
 		try
 		{
-			BundlableNode bundlableNode = getBundableNodeForRequest(brjs, requestUri, resp);
+			BundlableNode bundlableNode = getBundableNodeForRequest(brjs, requestUri);
 			contentPlugin.writeContent(contentPath, bundlableNode.getBundleSet(), resp.getOutputStream());
 		}
 		catch (MalformedRequestException ex)
@@ -84,15 +84,10 @@ public class BRJSServletUtils
 		}
 	}
 
-	public App getAppForRequest(BRJS brjs, BladerunnerUri requestUri, HttpServletResponse resp) throws ServletException, MalformedRequestException
+	public App getAppForRequest(BRJS brjs, BladerunnerUri requestUri) throws ServletException, MalformedRequestException
 	{
-		String appName = StringUtils.substringAfter(requestUri.contextPath, "/");
-		if (appName.endsWith("/"))
-		{
-			appName = StringUtils.substringBeforeLast(appName, "/");
-		}
+		String appName = requestUri.getAppname();
 		App app = brjs.app(appName);
-		
 		
 		if (!app.dirExists())
 		{
@@ -106,9 +101,9 @@ public class BRJSServletUtils
 		return app;
 	}
 	
-	public BundlableNode getBundableNodeForRequest(BRJS brjs, BladerunnerUri requestUri, HttpServletResponse resp) throws ServletException, MalformedRequestException
+	public BundlableNode getBundableNodeForRequest(BRJS brjs, BladerunnerUri requestUri) throws ServletException, MalformedRequestException
 	{
-		App app = getAppForRequest(brjs, requestUri, resp);
+		App app = getAppForRequest(brjs, requestUri);
 		File baseDir = app.file(requestUri.scopePath);
 		BundlableNode bundlableNode = app.root().locateFirstBundlableAncestorNode(baseDir);
 		return bundlableNode;

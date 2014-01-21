@@ -179,6 +179,15 @@ public class BladerunnerUri
 		
 		return bundlableNode;
 	}
+	
+	public String getAppname(){
+		String appName = StringUtils.substringAfter(contextPath, "/");
+		if (appName.endsWith("/"))
+		{
+			appName = StringUtils.substringBeforeLast(appName, "/");
+		}
+		return appName;
+	}
 
 	public static boolean isBrjsUriRequest(HttpServletRequest request)
 	{
