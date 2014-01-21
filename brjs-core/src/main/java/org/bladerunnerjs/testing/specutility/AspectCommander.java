@@ -59,6 +59,20 @@ public class AspectCommander extends NodeCommander<Aspect> {
 		return commanderChainer;
 	}
 	
+	public CommanderChainer indexPageContentAppended(String className) throws IOException 
+	{
+		FileUtils.write(aspect.file("index.html"), FileUtils.readFileToString(aspect.file("index.html")) + "\n" + className);
+
+		return commanderChainer;
+	}
+	
+	public CommanderChainer indexPageContentIsOverriden(String className) throws IOException {
+		FileUtils.deleteQuietly(aspect.file("index.html"));
+		FileUtils.write(aspect.file("index.html"), className);
+		
+		return commanderChainer;
+	}
+	
 	private void pageLoaded(StringBuffer pageResponse, String locale, RequestMode opMode) throws ConfigException, IOException, ModelOperationException, NoTagHandlerFoundException, DocumentException {
 		StringWriter writer = new StringWriter();	
 		
